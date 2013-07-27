@@ -58,6 +58,50 @@
 
     });
 
+    asyncTest("Single reversed read/write test with reader delay", function () {
+        var c = new Channel(),
+            value = 1,
+            hdl;
+
+        hdl = setTimeout(function () {
+            ok(false, "Failed to read from prewritten Channel");
+            start();
+        }, 1000);
+
+        c.write(value);
+
+        setTimeout(function () {
+            c.read(function (val) {
+                clearTimeout(hdl);
+                strictEqual(val, value, "Ensure we received the correct value from the channel");
+                start();
+            });
+        }, 500);
+    });
+
+    asyncTest("Using alts for failure", function () {
+        var c = new Channel(),
+            fc = new Channel(),
+            value = 1,
+            hdl,
+            fHdl;
+
+        // Write to our failure channel in 500ms
+        dFdl = setTimeout(fc.write, 500);
+
+        // Write to our normal channel in 1000ms
+        hdl = setTimeout(c.write, 1000);
+
+        function finishTest(channel) {
+            clearTimeout(hdl);
+            clearTimeout(fHdl);
+            strictEqual(channel, fc, "We should read from the fail Channel");
+            start();
+        }
+
+        Channel.alts(finishTest, c, fc);
+    });
+
     asyncTest("Single reversed read/write test with multiple values", function () {
         var c = new Channel(),
             value = 1,
