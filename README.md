@@ -1,7 +1,7 @@
 JsChannels
 ==========
 
-A minimal JavaScript Channels library
+A minimal JavaScript Channels library (1.3k minified)
 
 A Channel provides two methods:
 * read(callback)
