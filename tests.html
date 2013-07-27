@@ -24,6 +24,62 @@
         c.write(value);
     });
 
+    asyncTest("Single read/write test with multiple values", function () {
+        var c = new Channel(),
+            value = 1,
+            value2 = 2;
+
+        c.read(function (val, val2) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            strictEqual(val2, value2, "Ensure we received the correct value2 from the channel");
+            start();
+        });
+
+        c.write(value, value2);
+    });
+
+    asyncTest("Single reversed read/write test", function () {
+        var c = new Channel(),
+            value = 1,
+            hdl;
+
+        hdl = setTimeout(function () {
+            ok(false, "Failed to read from prewritten Channel");
+            start();
+        }, 500);
+
+        c.write(value);
+
+        c.read(function (val) {
+            clearTimeout(hdl);
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            start();
+        });
+
+    });
+
+    asyncTest("Single reversed read/write test with multiple values", function () {
+        var c = new Channel(),
+            value = 1,
+            value2 = 2,
+            hdl;
+
+        hdl = setTimeout(function () {
+            ok(false, "Failed to read from prewritten Channel");
+            start();
+        }, 500);
+
+        c.write(value, value2);
+
+        c.read(function (val, val2) {
+            clearTimeout(hdl);
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            strictEqual(val2, value2, "Ensure we received the correct value2 from the channel");
+            start();
+        });
+
+    });
+
     // Simple test to validate the behavior of jQuery promises.  In order for a
     // promise calback to return a deferred which affects future callbacks, they
     // must be bound in a chain of .then calls.
@@ -143,6 +199,31 @@
         while (++i < num) {
             c.write(value);
         }
+    });
+
+    asyncTest("Single reversed multi write test", function () {
+        var c = new Channel(),
+            value = 1,
+            value2 = 2,
+            value3 = 3,
+            count = 0,
+            hdl;
+
+        hdl = setTimeout(function () {
+            ok(false, "Failed to read from prewritten Channel");
+            start();
+        }, 500);
+
+        c.write(value);
+        c.write(value2);
+        c.write(value3);
+
+        c.read(function (val) {
+            clearTimeout(hdl);
+            strictEqual(val, ++count, "Ensure we received the correct value from the channel");
+            if(count === 3) { start(); }
+        });
+
     });
 
     asyncTest("Multiple read/write test", function () {

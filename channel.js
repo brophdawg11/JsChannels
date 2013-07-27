@@ -9,6 +9,9 @@
             // the new deferred.
             channelDeferred,
 
+            // Writes that have been queued up if there are no readers yet
+            queuedWrites = [],
+
             // The callbacks associated through the read function
             callbacks = [],
 
@@ -122,6 +125,11 @@
             // This will re-bind all existing callbacks to the new cb if needed
             maybeInitializeDfd(true);
 
+            // If we had queuedWrites, now that we have a reader, write them
+            while (queuedWrites.length > 0) {
+                self.write.apply(self, queuedWrites.shift());
+            }
+
             return self;
         };
 
@@ -130,13 +138,18 @@
          * @param  {Object} val The value to write to the channel
          * @return {Channel}    The channel object, for chaining purposes
          */
-        this.write = function write(val) {
-            // Possibly reset our deferred if non-existant or already resolved
-            // This will re-bind all existing callbacks to the new cb if needed
-            maybeInitializeDfd();
+        this.write = function write() {
+            if (callbacks.length === 0) {
+                // There are no readers yet, queue this up
+                queuedWrites.push(arguments);
+            } else {
+                // Possibly reset our deferred if non-existant or already resolved
+                // This will re-bind all existing callbacks to the new cb if needed
+                maybeInitializeDfd();
 
-            // Resolve the deferred with the channel value
-            channelDeferred.resolve(val);
+                // Resolve the deferred with the channel value
+                channelDeferred.resolve.apply(this, arguments);
+            }
 
             return self;
         };
