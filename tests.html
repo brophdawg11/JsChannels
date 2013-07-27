@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+   <title>Channels QUnit Tests</title>
+   <link rel="stylesheet" href="resources/qunit-1.12.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="resources/qunit-1.12.0.js"></script>
+  <script src="resources/jquery-1.10.2.js"></script>
+  <script src="channel.js"></script>
+  <script>
+    asyncTest("Single read/write test", function () {
+        var c = new Channel(),
+            value = 1;
+
+        c.read(function (val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            start();
+        });
+
+        c.write(value);
+    });
+
+    // Simple test to validate the behavior of jQuery promises.  In order for a
+    // promise calback to return a deferred which affects future callbacks, they
+    // must be bound in a chain of .then calls.
+    //
+    // This works:
+    //     deferred.then(asyncFunction).then(anotherFunction)
+    //
+    // This does not:
+    //     deferred.then(asyncFunction)
+    //     deferred.then(anotherFunction)  // Will not wait on asyncFunction to resolve
+    //
+    asyncTest("jQuery promise behavior test", function () {
+        var d = new $.Deferred(),
+            startTime = Date.now(),
+            delay = 250;
+
+        function blockingFunc(val) {
+            console.log("Resolving deferred in 3 seconds...");
+            var dfd = new $.Deferred();
+            setTimeout(dfd.resolve, delay);
+            return dfd;
+        }
+
+        function nonBlockingFunc(val) {
+            console.log("Resolving deferred immediately...");
+            ok(Date.now() > startTime + delay, "Ensuring we blocked during the blocking channel read");
+            start();
+        }
+
+        d.then(blockingFunc).then(nonBlockingFunc);
+        d.resolve();
+    });
+
+    asyncTest("Blocking read test", function () {
+        var c = new Channel({blocking: true}),
+            value = 1,
+            startTime = Date.now(),
+            delay = 250;
+
+        function blockingFunc(val) {
+            console.log("Resolving deferred in 3 seconds...");
+            var dfd = new $.Deferred();
+            setTimeout(function() { console.log("Resolving..."); dfd.resolve(); }, delay);
+            return dfd;
+        }
+
+        function nonBlockingFunc(val) {
+            console.log("Resolving deferred immediately...");
+            ok(Date.now() > startTime + delay, "Ensuring we blocked during the blocking channel read");
+            start();
+        }
+
+        c.read(blockingFunc);
+        c.read(nonBlockingFunc);
+
+        c.write(value);
+    });
+
+    asyncTest("Blocking read test (using BlockingChannel)", function () {
+        var c = new BlockingChannel(),
+            value = 1,
+            startTime = Date.now(),
+            delay = 250;
+
+        function blockingFunc(val) {
+            console.log("Resolving deferred in 3 seconds...");
+            var dfd = new $.Deferred();
+            setTimeout(function() { console.log("Resolving..."); dfd.resolve(); }, delay);
+            return dfd;
+        }
+
+        function nonBlockingFunc(val) {
+            console.log("Resolving deferred immediately...");
+            ok(Date.now() > startTime + delay, "Ensuring we blocked during the blocking channel read");
+            start();
+        }
+
+        c.read(blockingFunc);
+        c.read(nonBlockingFunc);
+
+        c.write(value);
+    });
+
+    asyncTest("Multiple read test", function () {
+        var c = new Channel(),
+            value = 1,
+            num = 5,
+            count = 0,
+            i = -1;
+
+        function verifyValue(val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            if(++count === num) { start(); }
+        }
+
+        while (++i < num) {
+            c.read(verifyValue);
+        }
+
+        c.write(value);
+    });
+
+    asyncTest("Multiple write test", function () {
+        var c = new Channel(),
+            value = 1,
+            num = 5,
+            count = 0,
+            i = -1;
+
+        function verifyValue(val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            if(++count === num) { start(); }
+        }
+
+        c.read(verifyValue);
+
+        while (++i < num) {
+            c.write(value);
+        }
+    });
+
+    asyncTest("Multiple read/write test", function () {
+        var c = new Channel(),
+            i = -1,
+            value;
+
+
+        function verifyValue(val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+        }
+
+        // This will run each time we write to the channel testing the current value
+        c.read(verifyValue);
+        c.read(verifyValue);
+
+        value = 1;
+        c.write(value);
+
+        value = 2;
+        c.write(value);
+
+        value = "Hello";
+        c.read(start);  // Force the test to finish after the next write
+        c.write(value);
+    });
+
+    asyncTest("Chained read test", function () {
+        var c = new Channel(),
+            value = 1,
+            count = 2;
+
+        function verifyValue(val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            if (--count === 0) { start(); }
+        }
+
+        c.read(verifyValue).read(verifyValue);
+        c.write(value);
+    });
+
+    asyncTest("Chained write test", function () {
+        var c = new Channel(),
+            value = 1,
+            count = 2;
+
+        function verifyValue(val) {
+            strictEqual(val, value, "Ensure we received the correct value from the channel");
+            if (--count === 0) { start(); }
+        }
+
+        c.read(verifyValue);
+        c.write(value).write(value);
+    });
+
+    asyncTest("Test Channel.alts()", function () {
+        var c0 = new Channel(),
+            c1 = new Channel(),
+            channels = [c0, c1],
+            values = [0,1,1,0,0,1,1,0],
+            clonedValues = [],
+            i,
+            len = values.length,
+            idx;
+
+        function multiRead(channel, value) {
+            strictEqual(values.shift(), value, "Ensure we got the right value in the right order");
+            if(values.length === 0) { start(); }
+        }
+
+        i = -1;
+        while (++i < len) {
+            clonedValues.push(values[i]);
+        }
+
+        Channel.alts(multiRead, c0, c1);
+
+        i = -1;
+        while (++i < len) {
+            idx = clonedValues[i];
+            channels[idx].write(idx);
+        }
+    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Channels Examples</title>
+  <style>
+      #container,
+      #container2,
+      #container3,
+      #container4,
+      #container5 {
+          margin-left: 50px;
+      }
+  </style>
+</head>
+<body>
+  <script src="resources/jquery-1.10.2.min.js"></script>
+  <script src="resources/lodash.min.js"></script>
+  <script src="channel.js"></script>
+
+  <p>
+      This is a set of examples, aimed at replicating the functionality offered
+      by the Clojure core.async library, as shown
+      <a href="http://swannodette.github.io/2013/07/12/communicating-sequential-processes/">here</a>.
+  </p>
+
+  <p>
+      Processes running at different intervals:
+  </p>
+  <style>
+      #container { height: 200px; }
+      .value-1, .value-2, .value-3 { margin: 0; padding: 0;}
+      .value-1 { color: red; }
+      .value-2 { color: green; }
+      .value-3 { color: blue; }
+  </style>
+  <div id="container"></div>
+  <script>
+    (function () {
+        var c = new Channel(),
+            intervals = [],
+            values = [];
+
+        function render() {
+            var div = document.getElementById("container");
+            div.innerHTML = "";
+            for (var i = 0; i < values.length; i++) {
+                div.innerHTML += "<p class='value-" + values[i] + "'>Process " + values[i] + "</p>";
+            }
+        }
+
+        function readValue(val) {
+            // If we're bigger than 10, remove older elements from the end
+            if (values.length > 10) { values.splice(10, 1); }
+
+            // Add this to the beginning
+            values.unshift(val);
+
+            // Render our current 10 processes
+            render();
+        }
+
+        function putValue(value) {
+            c.write(value);
+        }
+
+        // Local partial implementation
+        function partial() {
+            var pArgs = Array.prototype.slice.call(arguments, 0),
+                func = pArgs.shift();
+            return function() {
+                var innerArgs = Array.prototype.slice.call(arguments, 0);
+                return func.apply(this, pArgs.concat(innerArgs));
+            };
+        }
+
+        function startTimeouts() {
+            intervals.push(setInterval(partial(putValue, 1), 250));
+            intervals.push(setInterval(partial(putValue, 2), 1000));
+            intervals.push(setInterval(partial(putValue, 3), 1500));
+        }
+
+        c.read(readValue);
+        startTimeouts();
+    })();
+  </script>
+
+  <p>
+      Patching DOM events through a Channel (mouse coordinates relative to the window):
+  </p>
+  <style>
+      #container2 {
+          width: 600px;
+          height: 100px;
+          background-color: gray;
+          border: 1px solid black;
+      }
+  </style>
+  <div id="container2"></div>
+  <script>
+    (function () {
+
+        var c = new Channel(),
+            div = document.getElementById("container2");
+
+        function logCoords(e) {
+            div.innerHTML = e.pageX + ", " + e.pageY;
+        }
+
+        div.addEventListener('mousemove', c.write);
+
+        c.read(logCoords);
+    })();
+  </script>
+
+
+  <p>
+      Patching DOM events through a Channel (mouse coordinates relative to container):
+  </p>
+  <style>
+      #container3 {
+          width: 600px;
+          height: 100px;
+          background-color: gray;
+          border: 1px solid black;
+      }
+  </style>
+  <div id="container3"></div>
+  <script>
+    (function () {
+
+        var c = new Channel(),
+            div = document.getElementById("container3");
+
+        function logCoords(e) {
+            div.innerHTML = (e.pageX - e.target.offsetLeft) + ", " +
+                            (e.pageY - e.target.offsetTop);
+        }
+
+        div.addEventListener('mousemove', c.write);
+
+        c.read(logCoords);
+    })();
+  </script>
+
+  <p>
+      Patching multiple DOM events through channels:
+  </p>
+  <style>
+      #container4 {
+          width: 600px;
+          height: 100px;
+          background-color: gray;
+          border: 1px solid black;
+      }
+  </style>
+  <div id="container4">
+      <span class="mouse"></span> : <span class="key"></span>
+  </div>
+  <script>
+    (function () {
+
+        var mc = new Channel(),
+            kc = new Channel(),
+            div = document.getElementById("container4"),
+            mSpan = div.getElementsByClassName("mouse")[0],
+            kSpan = div.getElementsByClassName("key")[0];
+
+        function logMouseCoords(e) {
+            mSpan.innerHTML = (e.pageX - e.target.offsetLeft) + ", " +
+                            (e.pageY - e.target.offsetTop);
+        }
+
+        function logKeyCode(e) {
+            kSpan.innerHTML = e.keyCode;
+        }
+
+        div.addEventListener('mousemove', mc.write);
+        window.addEventListener('keyup', function (e) {
+            kc.write(e)
+        });
+
+        mc.read(logMouseCoords);
+        kc.read(logKeyCode);
+    })();
+  </script>
+
+  <p>
+      Patching multiple DOM events through channels, using alts:
+  </p>
+  <style>
+      #container5 {
+          width: 600px;
+          height: 100px;
+          background-color: gray;
+          border: 1px solid black;
+      }
+  </style>
+  <div id="container5">
+      <span class="mouse"></span> : <span class="key"></span>
+  </div>
+  <script>
+    (function () {
+
+        var mc = new Channel(),
+            kc = new Channel(),
+            div = document.getElementById("container5"),
+            mSpan = div.getElementsByClassName("mouse")[0],
+            kSpan = div.getElementsByClassName("key")[0];
+
+        function logMouseCoords(e) {
+            mSpan.innerHTML = (e.pageX - e.target.offsetLeft) + ", " +
+                            (e.pageY - e.target.offsetTop);
+        }
+
+        function logKeyCode(e) {
+            kSpan.innerHTML = e.keyCode;
+        }
+
+        div.addEventListener('mousemove', mc.write);
+        window.addEventListener('keyup', function (e) {
+            kc.write(e)
+        });
+
+        function multiChannelRead(channel, value) {
+            if(channel === mc) {
+                logMouseCoords(value);
+            } else if (channel === kc) {
+                logKeyCode(value);
+            }
+        }
+
+        Channel.alts(multiChannelRead, mc, kc);
+    })();
+  </script>
+</body>
+</html>
