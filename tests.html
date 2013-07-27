@@ -165,9 +165,9 @@
 
         function blockingFunc(val) {
             console.log("Resolving deferred in 3 seconds...");
-            var dfd = new $.Deferred();
-            setTimeout(function() { console.log("Resolving..."); dfd.resolve(); }, delay);
-            return dfd;
+            var c = new Channel();
+            setTimeout(function() { console.log("Resolving..."); c.write(); }, delay);
+            return c;
         }
 
         function nonBlockingFunc(val) {
@@ -190,9 +190,9 @@
 
         function blockingFunc(val) {
             console.log("Resolving deferred in 3 seconds...");
-            var dfd = new $.Deferred();
-            setTimeout(function() { console.log("Resolving..."); dfd.resolve(); }, delay);
-            return dfd;
+            var c = new Channel();
+            setTimeout(function() { console.log("Resolving..."); c.write(); }, delay);
+            return c;
         }
 
         function nonBlockingFunc(val) {

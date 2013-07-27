@@ -36,13 +36,14 @@
 
         // Proxy the users callback function to ensure that it returns a
         // suitable value to pass to $.when() (i.e., a Deferred or true)
-        function getHandleReturnFunc(func) {
+        function getHandleReturnFunc(func, dfd) {
             return function() {
                 var retVal = func.apply(this, arguments);
-                if(retVal && typeof retVal.promise === 'function') {
-                    return retVal;
+                if(retVal && typeof retVal.read === 'function') {
+                    retVal.read(dfd.resolve);
+                    return dfd;
                 } else {
-                    return true;  // Force immediate resolution
+                    return dfd.resolve();  // Force immediate resolution of $.when
                 }
             };
         }
@@ -96,13 +97,11 @@
                         // Get a promise that resolves once the Channel deferred
                         // and all prior callback deferreds resolve
                         $.when.apply(this, [channelDeferred].concat(deferreds))
-                              // Then run my callback, which may returnit's own
-                              // deferred
-                              .then(getHandleReturnFunc(callbacks[i]))
-                              // And once my callbacks is resolved, we resolve
-                              // my deferred to allow the rest of the chain to
-                              // execute
-                              .then(cbDfd.resolve);
+                              // Then run my callback.  If it returns a Channel,
+                              // well resolve our deferred on a read from that
+                              // channel.  If not, we'll resolve the deferred
+                              // immediately
+                              .then(getHandleReturnFunc(callbacks[i], cbDfd));
 
                         // Add my deferred to our queue
                         deferreds.push(cbDfd);
