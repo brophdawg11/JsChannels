@@ -17,7 +17,6 @@
 
             // Default options
             defaults = {
-                'debug' : false,
                 'blocking' : false
             },
 
@@ -29,13 +28,6 @@
         for (key in defaults) {
             if (typeof options[key] === 'undefined' || options[key === null]) {
                 options[key] = defaults[key];
-            }
-        }
-
-        // Local debug output function
-        function debug(s) {
-            if (options.debug === true) {
-                console.log("Channel: " + s);
             }
         }
 
@@ -123,8 +115,6 @@
          * @return {Channel}     The channel object, for chaining purposes
          */
         this.read = function read(cb) {
-            debug("Binding read callback to channel");
-
             // Add this callback to the queue
             callbacks.push(cb);
 
@@ -141,8 +131,6 @@
          * @return {Channel}    The channel object, for chaining purposes
          */
         this.write = function write(val) {
-            debug("Writing to channel: " + val);
-
             // Possibly reset our deferred if non-existant or already resolved
             // This will re-bind all existing callbacks to the new cb if needed
             maybeInitializeDfd();
