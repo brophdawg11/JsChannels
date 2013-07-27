@@ -15,8 +15,9 @@ writes) will be queued on the Channel until the first reader is registered.
 
 BlockingChannels allow the readers to perform asyncronous operations, delaying
 subsequent reader invocation.  Reader callbacks attached to blocking channels can
-return a Channel object call Channel.write() once the reader async operations
-are complete.
+return a Channel object and must call write() on that Channel once the reader
+async operations are complete, which iwll allow continued execution of subsequent
+readers.
 
 ### Example Usage:
 
