@@ -60,7 +60,8 @@ readers.
     c5.write(3);
 
 
-    // Blocking channels accept Deferred return values from reader functions
+    // Blocking Channels can accept Channel return values from reader functions,
+    // that will be written when the asynchronous reader operation is complete
     var c6 = new BlockingChannel();
     c6.read(function (val) {
         console.log("Blocking reading on this channel6 for 1s");
