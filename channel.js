@@ -1,13 +1,8 @@
-(function (window, $, undefined) {
+(function (window, undefined) {
 
     function Channel(options) {
 
         var self = this,
-
-            // The deferred object for the channel.  This is reinitialized every
-            // time a read() operation is executed, and we rebind the callback to
-            // the new deferred.
-            channelDeferred,
 
             // Writes that have been queued up if there are no readers yet
             queuedWrites = [],
@@ -15,13 +10,17 @@
             // The callbacks associated through the read function
             callbacks = [],
 
-            // The deferreds associated with the calbacks in a blocking Channel
-            deferreds = [],
+            // What indexed callback are we on?  -1 -> idle
+            cbIndex = -1,
+
+            // What are the arguments of our most recent write?
+            writeArgs = null,
+
+            // Am I currently blocked?
+            blocked = false,
 
             // Default options
-            defaults = {
-                'blocking' : false
-            },
+            defaults = {},
 
             key;
 
@@ -34,79 +33,32 @@
             }
         }
 
-        // Proxy the users callback function to ensure that it returns a
-        // suitable value to pass to $.when() (i.e., a Deferred or true)
-        function getHandleReturnFunc(func, dfd) {
-            return function() {
-                var retVal = func.apply(this, arguments);
-                if(retVal && typeof retVal.read === 'function') {
-                    retVal.read(dfd.resolve);
-                    return dfd;
-                } else {
-                    return dfd.resolve();  // Force immediate resolution of $.when
-                }
-            };
+
+        function maybeSendQueuedWrites() {
+            // If we had queuedWrites, now that we have a reader, write them
+            if (!blocked && queuedWrites.length > 0) {
+                cbIndex = -1;
+                writeArgs = queuedWrites.shift();
+                doWrite.apply(this);
+            }
         }
 
-        // Initialize our channelDeferred object.  This is called with every
-        // read call to add in the new callback.  It is called with every write
-        // call to ensure we recycle the channlDeferred so that old read callbacks
-        // get bound to the new, unresolved channelDeferred
-        function maybeInitializeDfd(force) {
-            force = force === true ? true : false;
-            if (!channelDeferred || channelDeferred.state() !== "pending" || force) {
-                channelDeferred = new $.Deferred();
-                var i, len, cbDfd;
+        function doWrite() {
 
-                if(!options.blocking) {
-                    // Handle non blocking channels.
-                    // Bind all callabcks directly to the deferred, not to the
-                    // returned promises.  This causes the same value from the
-                    // inital write to get passed to every read, without our
-                    // interaction.  This means, also, that return values from
-                    // callbacks have no impact on execution
-                    i = -1;
-                    len = callbacks.length;
-                    while (++i < len) {
-                        channelDeferred.then(callbacks[i]);
-                    }
-                } else {
-                    // For Blocking Channels, bind callbacks to the returned
-                    // promises.  This means that you can return a deferred if
-                    // you want your read to block.  However, we need to ensure
-                    // the right value gets passed through, we dont want
-                    // channels chaining return values through
+            if (++cbIndex >= callbacks.length || writeArgs === null) {
+                // We're done writing to all callbacks
+                cbIndex = -1;
+                writeArgs = null;
+                maybeSendQueuedWrites();
+                return;
+            }
 
-                    // If we are re-initializing, we need to reject any previous
-                    // deferreds that may still resolve.  We'll immediately rebind
-                    // to them, based on the Channel deferred
-                    i = -1;
-                    len = deferreds.length;
-                    while (++i < len) {
-                        deferreds[i].reject("Invalidating and replacing with a new deferred.");
-                    }
+            // Run the current reader
+            callbacks[cbIndex].apply(this, writeArgs);
 
-                    deferreds = [];
-
-                    i = -1;
-                    len = callbacks.length;
-                    while (++i < len) {
-                        // Create a deferred to indicate when this callback is done
-                        cbDfd = new $.Deferred();
-
-                        // Get a promise that resolves once the Channel deferred
-                        // and all prior callback deferreds resolve
-                        $.when.apply(this, [channelDeferred].concat(deferreds))
-                              // Then run my callback.  If it returns a Channel,
-                              // well resolve our deferred on a read from that
-                              // channel.  If not, we'll resolve the deferred
-                              // immediately
-                              .then(getHandleReturnFunc(callbacks[i], cbDfd));
-
-                        // Add my deferred to our queue
-                        deferreds.push(cbDfd);
-                    }
-                }
+            // If not blocked, recurse
+            if (!blocked) {
+                doWrite();
             }
         }
 
@@ -119,17 +71,51 @@
         this.read = function read(cb) {
             // Add this callback to the queue
             callbacks.push(cb);
-
-            // Possibly reset our deferred if non-existant or already resolved
-            // This will re-bind all existing callbacks to the new cb if needed
-            maybeInitializeDfd(true);
-
-            // If we had queuedWrites, now that we have a reader, write them
-            while (queuedWrites.length > 0) {
-                self.write.apply(self, queuedWrites.shift());
-            }
-
+            maybeSendQueuedWrites();
             return self;
+        };
+
+        /**
+         * Remove a specified reader from the Channel
+         * @param  {Function} cb The reader to remove
+         * @return {Channe;l}    The Channel for chaining
+         */
+        this.unread = function read(cb) {
+            var i = -1, len = callbacks.length;
+            while (++i < len) {
+                if (callbacks[i] === cb) {
+                    callbacks.splice(i, 1);
+                    break;
+                }
+            }
+            return self;
+        };
+
+        /**
+         * Block the given channel from future reads/writes until unblocked.
+         * @return {Booean} True if the channel was unblocked and successfully blocked
+         *                  False if the channel was already blocked.
+         */
+        this.block = function block() {
+            if (!blocked) {
+                blocked = true;
+                return true;
+            }
+            return false;
+        };
+
+        /**
+         * Unblock the Channel
+         * @return {Boolean} True if the channel was blocked and was
+         * successfully unblocked.  False if it was already unblocked
+         */
+        this.unblock = function unblock() {
+            if (blocked) {
+                blocked = false;
+                doWrite();
+                return true;
+            }
+            return false;
         };
 
         /**
@@ -138,16 +124,13 @@
          * @return {Channel}    The channel object, for chaining purposes
          */
         this.write = function write() {
-            if (callbacks.length === 0) {
+            if (callbacks.length === 0 || queuedWrites.length > 0 || blocked) {
                 // There are no readers yet, queue this up
                 queuedWrites.push(arguments);
             } else {
-                // Possibly reset our deferred if non-existant or already resolved
-                // This will re-bind all existing callbacks to the new cb if needed
-                maybeInitializeDfd();
-
-                // Resolve the deferred with the channel value
-                channelDeferred.resolve.apply(this, arguments);
+                // Write!
+                writeArgs = arguments;
+                doWrite.apply(self);
             }
 
             return self;
@@ -178,19 +161,55 @@
             };
         }
 
-        // For each channel passed in, hook in our readValue function
+        // For each channel passed in, hook in our callback
         while (++i < len) {
             c = args[i];
             c.read(partial(cb, c));
         }
     };
 
-    window.BlockingChannel = function BlockingChannel(options) {
-        options = typeof options === 'object' ? options : {};
-        options.blocking = true;
-        Channel.call(this, options);
+    /**
+     * Provide a mechanism to read from one of a series of callbacks.  After the
+     * read, the callback is unbound from all channels so that it does not fire
+     * again.
+     *
+     * @param {Function} cb Callback function to be executed when the first of the
+     *                      specified channels is written to.  Will be passed
+     *                      the Channel, followed by all written values
+     * @param {Channel}  channel The Channel to read from.  Pass as many as you want
+     */
+    Channel.select = function (cb) {
+        // Shift off the callback from the arguments array
+        var args = Array.prototype.splice.call(arguments, 1),
+            i = -1,
+            len = args.length,
+            c,
+            wraps = [];
+
+        // Get a wrapped function for this channel/callback combo
+        function wrap (channel, callback) {
+            return function wrapped() {
+                var j = -1,
+                    len = args.length;
+                console.log("J is " + j);
+
+                // Unbind this reader from all channels
+                while (++j < len) {
+                    args[j].unread(wraps[j]);
+                }
+
+                return callback.apply(this, arguments);
+            };
+        }
+
+        // For each channel passed in, cache the callback, and bind it
+        while (++i < len) {
+            c = args[i];
+            wraps.push(wrap(c,cb));
+            c.read(wraps[i]);
+        }
     };
 
     window.Channel = Channel;
 
-}(this, jQuery));
+}(this));

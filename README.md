@@ -3,9 +3,16 @@ JsChannels
 
 A minimal JavaScript Channels library (1.3k minified)
 
-A Channel provides two methods:
-* read(callback)
-* write(value1, value2, ...)
+A Channel provides the following methods
+* write(value1, value2, ...) - Write the values[s] to the Channel
+* read(callback) - Assign a reader to the Channel
+* unread(callback) - Remove a reader from the Channel
+* block() - Block the Channel
+* unblock() - Unblock the Channel
+
+The Channel class provides two static utility methods:
+* Channel.alts(callback, Channel, Channel, ...) - Associated a callback with many channels
+* Channel.select(callback, Channel, Channel, ...) - Associated a callback with many channels, for which the reader will execute on the first Channel to be wrtten to, an no others.
 
 When a channel is written to, all associated reader callbacks will be invoked,
 in order of registration, with the values written to the channel.
@@ -13,11 +20,7 @@ in order of registration, with the values written to the channel.
 If a no readers are available at the time of a write, the write (and subsequent
 writes) will be queued on the Channel until the first reader is registered.
 
-BlockingChannels allow the readers to perform asyncronous operations, delaying
-subsequent reader invocation.  Reader callbacks attached to blocking channels can
-return a Channel object and must call write() on that Channel once the reader
-async operations are complete, which iwll allow continued execution of subsequent
-readers.
+Reader callbacks are executed with the Channel object as the 'this' context
 
 ### Example Usage:
 
@@ -60,16 +63,23 @@ readers.
     c5.write(3);
 
 
-    // Blocking Channels can accept Channel return values from reader functions,
-    // that will be written when the asynchronous reader operation is complete
-    var c6 = new BlockingChannel();
+    // Readers can block the channel if needed
+    var c6 = new Channel();
     c6.read(function (val) {
         console.log("Blocking reading on this channel6 for 1s");
-        var c = new Channel();
-        setTimeout(c.write, 1000);
-        return c;
+        this.block();
+        setTimeout(this.unblock, 1000);
     });
     c6.read(function (val) {
         console.log("The last reader on channel 6 unblocked, my turn!");
     });
     c6.write(1);
+
+    // Writers can block the channel if needed
+    var c7 = new Channel();
+    c7.read(function (val) { console.log("Read from Channel7: " + val); });
+    c7.write(1);
+    c7.block();
+    c7.write(2);
+    setTimeout(c7.unblock, 1000);
+

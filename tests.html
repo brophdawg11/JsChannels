@@ -9,7 +9,6 @@
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
   <script src="resources/qunit-1.12.0.js"></script>
-  <script src="resources/jquery-1.10.2.min.js"></script>
   <script src="channel.js"></script>
   <script>
     asyncTest("Single read/write test", function () {
@@ -22,6 +21,22 @@
         });
 
         c.write(value);
+    });
+
+    asyncTest("Single read/write/unread/write test", function () {
+        var c = new Channel(),
+            count = 0;
+
+        function read(val) {
+            if (++count > 1) { ok(false, "We should only read once!"); }
+        }
+
+        c.read(read);
+        c.write();  // Should run the callbacks
+        c.unread(read)
+        c.write();  // Should not run the callback
+        ok(true, "Provide a single assertion for the valid case");
+        start();
     });
 
     asyncTest("Single read/write test with multiple values", function () {
@@ -79,7 +94,7 @@
         }, 500);
     });
 
-    asyncTest("Using alts for failure", function () {
+    asyncTest("Using select for failure", function () {
         var c = new Channel(),
             fc = new Channel(),
             value = 1,
@@ -92,14 +107,12 @@
         // Write to our normal channel in 1000ms
         hdl = setTimeout(c.write, 1000);
 
-        function finishTest(channel) {
-            clearTimeout(hdl);
-            clearTimeout(fHdl);
-            strictEqual(channel, fc, "We should read from the fail Channel");
+        function finishTest() {
+            strictEqual(this, fc, "We should read from the fail Channel");
             start();
         }
 
-        Channel.alts(finishTest, c, fc);
+        Channel.select(finishTest, c, fc);
     });
 
     asyncTest("Single reversed read/write test with multiple values", function () {
@@ -124,50 +137,16 @@
 
     });
 
-    // Simple test to validate the behavior of jQuery promises.  In order for a
-    // promise calback to return a deferred which affects future callbacks, they
-    // must be bound in a chain of .then calls.
-    //
-    // This works:
-    //     deferred.then(asyncFunction).then(anotherFunction)
-    //
-    // This does not:
-    //     deferred.then(asyncFunction)
-    //     deferred.then(anotherFunction)  // Will not wait on asyncFunction to resolve
-    //
-    asyncTest("jQuery promise behavior test", function () {
-        var d = new $.Deferred(),
-            startTime = Date.now(),
-            delay = 250;
-
-        function blockingFunc(val) {
-            console.log("Resolving deferred in 3 seconds...");
-            var dfd = new $.Deferred();
-            setTimeout(dfd.resolve, delay);
-            return dfd;
-        }
-
-        function nonBlockingFunc(val) {
-            console.log("Resolving deferred immediately...");
-            ok(Date.now() > startTime + delay, "Ensuring we blocked during the blocking channel read");
-            start();
-        }
-
-        d.then(blockingFunc).then(nonBlockingFunc);
-        d.resolve();
-    });
-
     asyncTest("Blocking read test", function () {
-        var c = new Channel({blocking: true}),
+        var c = new Channel(),
             value = 1,
             startTime = Date.now(),
             delay = 250;
 
         function blockingFunc(val) {
             console.log("Resolving deferred in 3 seconds...");
-            var c = new Channel();
-            setTimeout(function() { console.log("Resolving..."); c.write(); }, delay);
-            return c;
+            c.block();
+            setTimeout(function() { console.log("Resolving..."); c.unblock(); }, delay);
         }
 
         function nonBlockingFunc(val) {
@@ -182,30 +161,6 @@
         c.write(value);
     });
 
-    asyncTest("Blocking read test (using BlockingChannel)", function () {
-        var c = new BlockingChannel(),
-            value = 1,
-            startTime = Date.now(),
-            delay = 250;
-
-        function blockingFunc(val) {
-            console.log("Resolving deferred in 3 seconds...");
-            var c = new Channel();
-            setTimeout(function() { console.log("Resolving..."); c.write(); }, delay);
-            return c;
-        }
-
-        function nonBlockingFunc(val) {
-            console.log("Resolving deferred immediately...");
-            ok(Date.now() > startTime + delay, "Ensuring we blocked during the blocking channel read");
-            start();
-        }
-
-        c.read(blockingFunc);
-        c.read(nonBlockingFunc);
-
-        c.write(value);
-    });
 
     asyncTest("Multiple read test", function () {
         var c = new Channel(),
@@ -350,6 +305,53 @@
             idx = clonedValues[i];
             channels[idx].write(idx);
         }
+    });
+
+    asyncTest("Test multi read same callbacks", function () {
+        var c0 = new Channel(),
+            c1 = new Channel(),
+            channels = [c0, c1],
+            values = [0,1,1,0,0,1,1,0],
+            clonedValues = [],
+            i,
+            len = values.length,
+            idx;
+
+        function multiRead(value) {
+            strictEqual(values.shift(), value, "Ensure we got the right value in the right order");
+            if(values.length === 0) { start(); }
+        }
+
+        i = -1;
+        while (++i < len) {
+            clonedValues.push(values[i]);
+        }
+
+        c0.read(multiRead);
+        c1.read(multiRead);
+
+        i = -1;
+        while (++i < len) {
+            idx = clonedValues[i];
+            channels[idx].write(idx);
+        }
+    });
+
+    asyncTest("Test Channel.select()", function () {
+        var c0 = new Channel(),
+            c1 = new Channel(),
+            count = 0;
+
+        function read() {
+            if(++count > 1) { ok(false, "Should not read more than once!"); }
+        }
+
+        Channel.select(read, c0, c1);
+
+        c0.write();
+        c1.write();
+        ok(true, "Provide a single valid assertion for the happy path");
+        start();
     });
 
   </script>

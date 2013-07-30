@@ -14,7 +14,6 @@
   </style>
 </head>
 <body>
-  <script src="resources/jquery-1.10.2.min.js"></script>
   <script src="channel.js"></script>
 
   <p>
@@ -273,18 +272,25 @@
     c5.write(3);
 
 
-    // Blocking channels accept Deferred return values from reader functions
-    var c6 = new BlockingChannel();
+    // Readers can block the channel if needed
+    var c6 = new Channel();
     c6.read(function (val) {
         console.log("Blocking reading on this channel6 for 1s");
-        var c = new Channel();
-        setTimeout(c.write, 1000);
-        return c;
+        this.block();
+        setTimeout(this.unblock, 1000);
     });
     c6.read(function (val) {
         console.log("The last reader on channel 6 unblocked, my turn!");
     });
     c6.write(1);
+
+    // Writers can block the channel if needed
+    var c7 = new Channel();
+    c7.read(function (val) { console.log("Read from Channel7: " + val); });
+    c7.write(1);
+    c7.block();
+    c7.write(2);
+    setTimeout(c7.unblock, 1000);
   </script>
 </body>
 </html>
