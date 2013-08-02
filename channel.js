@@ -49,7 +49,7 @@
                 // We're done writing to all callbacks
                 cbIndex = -1;
                 writeArgs = null;
-                maybeSendQueuedWrites();
+                maybeSendQueuedWrites.apply(this);
                 return;
             }
 
@@ -58,7 +58,7 @@
 
             // If not blocked, recurse
             if (!blocked) {
-                doWrite();
+                doWrite.apply(this);
             }
         }
 
@@ -71,7 +71,7 @@
         this.read = function read(cb) {
             // Add this callback to the queue
             callbacks.push(cb);
-            maybeSendQueuedWrites();
+            maybeSendQueuedWrites.apply(this);
             return self;
         };
 
@@ -112,7 +112,7 @@
         this.unblock = function unblock() {
             if (blocked) {
                 blocked = false;
-                doWrite();
+                doWrite.apply(this);
                 return true;
             }
             return false;
@@ -130,10 +130,20 @@
             } else {
                 // Write!
                 writeArgs = arguments;
-                doWrite.apply(self);
+                doWrite.apply(this);
             }
 
             return self;
+        };
+    }
+
+    // Local partial implementation
+    function partial() {
+        var pArgs = Array.prototype.slice.call(arguments, 0),
+            func = pArgs.shift();
+        return function() {
+            var innerArgs = Array.prototype.slice.call(arguments, 0);
+            return func.apply(this, pArgs.concat(innerArgs));
         };
     }
 
@@ -150,16 +160,6 @@
             i = -1,
             len = args.length,
             c;
-
-        // Local partial implementation
-        function partial() {
-            var pArgs = Array.prototype.slice.call(arguments, 0),
-                func = pArgs.shift();
-            return function() {
-                var innerArgs = Array.prototype.slice.call(arguments, 0);
-                return func.apply(this, pArgs.concat(innerArgs));
-            };
-        }
 
         // For each channel passed in, hook in our callback
         while (++i < len) {
@@ -188,7 +188,7 @@
 
         // Get a wrapped function for this channel/callback combo
         function wrap (channel, callback) {
-            return function wrapped() {
+            return partial(function wrapped(channel) {
                 var j = -1,
                     len = args.length;
                 console.log("J is " + j);
@@ -198,8 +198,8 @@
                     args[j].unread(wraps[j]);
                 }
 
-                return callback.apply(this, arguments);
-            };
+                return callback.apply(channel, arguments);
+            }, channel);
         }
 
         // For each channel passed in, cache the callback, and bind it

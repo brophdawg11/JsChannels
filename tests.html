@@ -196,7 +196,7 @@
         c.read(verifyValue);
 
         while (++i < num) {
-            c.write(value);
+            c.write(++value);
         }
     });
 
@@ -342,16 +342,72 @@
             c1 = new Channel(),
             count = 0;
 
-        function read() {
+        function read(channel, val) {
+            ok(channel instanceof Channel, "Ensure we received the right arguments");
+            strictEqual(val, 0, "Ensure we received the right arguments");
             if(++count > 1) { ok(false, "Should not read more than once!"); }
         }
 
         Channel.select(read, c0, c1);
 
-        c0.write();
-        c1.write();
+        c0.write(0);
+        c1.write(1);
         ok(true, "Provide a single valid assertion for the happy path");
         start();
+    });
+
+    asyncTest("Test Ordering of writes in non-blocking Channel", function () {
+        var c0 = new Channel(),
+            c1 = new Channel(),
+            values = [];
+
+        function read(channel, val) {
+            values.push(val);
+        }
+
+        Channel.alts(read, c0, c1);
+        c0.write(0);
+        c1.write(1);
+        strictEqual(values[0], 0, "Ensure values came in the correct order");
+        strictEqual(values[1], 1, "Ensure values came in the correct order");
+        start();
+    });
+
+    asyncTest("Test Ordering of writes in blocking Channel", function () {
+        var c0 = new Channel(),
+            values = [];
+
+        function verify() {
+            for (var i = 0; i < 10; i++) {
+                strictEqual(values[i], i, "Ensure values came in the correct order");
+            }
+            start();
+        }
+
+        function maybeBlockingRead(val) {
+            var self = this;
+
+            if(arguments.length === 0) {
+                return verify();
+            }
+
+            if(val % 2 === 0) {
+                this.block();
+                setTimeout(function () {
+                    values.push(val);
+                    self.unblock();
+                }, 100);
+            } else {
+                values.push(val);
+            }
+        }
+
+        c0.read(maybeBlockingRead);
+        for (var i = 0; i < 10; i++) {
+            c0.write(i);
+        }
+
+        c0.write();
     });
 
   </script>

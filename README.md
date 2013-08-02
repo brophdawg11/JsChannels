@@ -11,8 +11,8 @@ A Channel provides the following methods
 * unblock() - Unblock the Channel
 
 The Channel class provides two static utility methods:
-* Channel.alts(callback, Channel, Channel, ...) - Associated a callback with many channels
-* Channel.select(callback, Channel, Channel, ...) - Associated a callback with many channels, for which the reader will execute on the first Channel to be wrtten to, an no others.
+* Channel.alts(callback, Channel, Channel, ...) - Associated a callback with many channels. Callbacks passed to alts will receive the Channel object as the first argument, followed by the arguments passed to Channel.write()
+* Channel.select(callback, Channel, Channel, ...) - Associated a callback with many channels, for which the reader will execute on the first Channel to be wrtten to, an no others.  Callbacks passed to alts will receive the Channel object as the first argument, followed by the arguments passed to Channel.write()
 
 When a channel is written to, all associated reader callbacks will be invoked,
 in order of registration, with the values written to the channel.
