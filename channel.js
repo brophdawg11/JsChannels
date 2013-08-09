@@ -45,7 +45,7 @@
 
         function doWrite() {
 
-            if (++cbIndex >= callbacks.length || writeArgs === null) {
+            if (cbIndex + 1 >= callbacks.length || writeArgs === null) {
                 // We're done writing to all callbacks
                 cbIndex = -1;
                 writeArgs = null;
@@ -54,7 +54,8 @@
             }
 
             // Run the current reader
-            callbacks[cbIndex].apply(this, writeArgs);
+            callbacks[cbIndex + 1].apply(this, writeArgs);
+            cbIndex++;
 
             // If not blocked, recurse
             if (!blocked) {
