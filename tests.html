@@ -9,6 +9,7 @@
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
   <script src="resources/qunit-1.12.0.js"></script>
+  <script src="resources/jquery-1.10.2.min.js"></script>
   <script src="channel.js"></script>
   <script>
     asyncTest("Single read/write test", function () {
@@ -408,6 +409,37 @@
         }
 
         c0.write();
+    });
+
+    asyncTest("Nested read test", function() {
+        var c = new Channel(),
+            d = new $.Deferred(),
+            count = 0,
+            timeout;
+        function reader(val) {
+            // val should always equal count, so test it
+            strictEqual(val, count);
+            count++;
+            // prevent infinite loop, only need to test > 1
+            if (count < 2) {
+                c.write(count);
+            } else {
+                clearTimeout(timeout);
+                ok(true);
+                d.resolve();
+            }
+        }
+        // once deferred is resolved or rejected, start the test
+        d.always(start);
+        // after a second, the test has failed (process has hung)
+        timeout = setTimeout(function () {
+            ok(false);
+            d.reject();
+        }, 1000);
+        // setup the reader
+        c.read(reader);
+        // initiate first write
+        c.write(count);
     });
 
   </script>
