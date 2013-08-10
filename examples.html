@@ -58,28 +58,12 @@
             render();
         }
 
-        function putValue(value) {
-            c.write(value);
-        }
-
-        // Local partial implementation
-        function partial() {
-            var pArgs = Array.prototype.slice.call(arguments, 0),
-                func = pArgs.shift();
-            return function() {
-                var innerArgs = Array.prototype.slice.call(arguments, 0);
-                return func.apply(this, pArgs.concat(innerArgs));
-            };
-        }
-
-        function startTimeouts() {
-            intervals.push(setInterval(partial(putValue, 1), 250));
-            intervals.push(setInterval(partial(putValue, 2), 1000));
-            intervals.push(setInterval(partial(putValue, 3), 1500));
-        }
-
         c.read(readValue);
-        startTimeouts();
+
+        // Write at different intervals
+        intervals.push(setInterval(c.write.bind(c, 1), 250));
+        intervals.push(setInterval(c.write.bind(c, 2), 1000));
+        intervals.push(setInterval(c.write.bind(c, 3), 1500));
     })();
   </script>
 

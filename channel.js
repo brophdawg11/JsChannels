@@ -141,16 +141,6 @@
         };
     }
 
-    // Local partial implementation
-    function partial() {
-        var pArgs = Array.prototype.slice.call(arguments, 0),
-            func = pArgs.shift();
-        return function() {
-            var innerArgs = Array.prototype.slice.call(arguments, 0);
-            return func.apply(this, pArgs.concat(innerArgs));
-        };
-    }
-
     /**
      * Provide a mechanism to read from many channels with a single callback
      * @param {Function} cb Callback function to be executed when any of the
@@ -168,7 +158,7 @@
         // For each channel passed in, hook in our callback
         while (++i < len) {
             c = args[i];
-            c.read(partial(cb, c));
+            c.read(cb.bind(this, c));
         }
     };
 
@@ -192,7 +182,7 @@
 
         // Get a wrapped function for this channel/callback combo
         function wrap (channel, callback) {
-            return partial(function wrapped(channel) {
+            return function wrapped(channel) {
                 var j = -1,
                     len = args.length;
                 console.log("J is " + j);
@@ -203,7 +193,7 @@
                 }
 
                 return callback.apply(channel, arguments);
-            }, channel);
+            }.bind(this, channel);
         }
 
         // For each channel passed in, cache the callback, and bind it
