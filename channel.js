@@ -124,8 +124,12 @@
          * @return {Channel}    The channel object, for chaining purposes
          */
         this.write = function write() {
-            if (callbacks.length === 0 || queuedWrites.length > 0 || blocked) {
-                // There are no readers yet, queue this up
+            if (callbacks.length === 0 || queuedWrites.length > 0 || blocked || cbIndex >= 0) {
+                // Queue up the write if:
+                // there are no readers OR
+                // we already have writes queued up OR
+                // we're currently blocked OR
+                // we're in the middle of processing a previous write
                 queuedWrites.push(arguments);
             } else {
                 // Write!

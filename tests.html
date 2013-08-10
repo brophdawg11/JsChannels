@@ -410,6 +410,37 @@
         c0.write();
     });
 
+
+    asyncTest("Test queuing writes from a reader", function() {
+        var c = new Channel(),
+            count = 0,
+            hdl;
+
+        function reader(val) {
+            // val should always equal count, so test it
+            strictEqual(val, count);
+            count++;
+            // prevent infinite loop, only need to test > 1
+            if (count < 2) {
+                c.write(count);
+            } else {
+                clearTimeout(hdl);
+                start();
+            }
+        }
+
+        // after a second, the test has failed (process has hung)
+        hdl = setTimeout(function () {
+            ok(false);
+            start();
+        }, 1000);
+
+        // setup the reader
+        c.read(reader);
+        // initiate first write
+        c.write(count);
+    });
+
   </script>
 </body>
 </html>
