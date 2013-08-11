@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>channel.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>channel.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="function"><span class="keyword">function</span> <span class="params">(window, undefined)</span> {</span>
+
+    <span class="function"><span class="keyword">function</span> <span class="title">Channel</span><span class="params">(options)</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2>Initialization</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> self = <span class="keyword">this</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Writes that have been queued up if there are no readers yet</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            queuedWrites = [],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Callbacks associated through the read function</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            callbacks = [],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Index of the currently processing callback for the most recent
+write.  -1 means idle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            cbIndex = -<span class="number">1</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Arguments of our most recent write</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            writeArgs = <span class="literal">null</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Am I currently blocked?</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            blocked = <span class="literal">false</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Default options</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            defaults = {};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Initialize options with default values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        options = <span class="keyword">typeof</span> options === <span class="string">'object'</span> ? options : {};
+        <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> defaults) {
+            <span class="keyword">if</span> (<span class="keyword">typeof</span> options[key] === <span class="string">'undefined'</span> || options[key === <span class="literal">null</span>]) {
+                options[key] = defaults[key];
+            }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h2>Private functions</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Try to send the next queued up write onto the channel.  If we&#39;re blocked, does nothing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">maybeSendQueuedWrites</span><span class="params">()</span> {</span>
+            <span class="keyword">if</span> (!blocked &amp;&amp; queuedWrites.length &gt; <span class="number">0</span>) {
+                cbIndex = -<span class="number">1</span>;
+                writeArgs = queuedWrites.shift();
+                doWrite.apply(<span class="keyword">this</span>);
+            }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Write the current channel value onto the current reader.  Recurses on itself to process subsequent readers</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">doWrite</span><span class="params">()</span> {</span>
+
+            <span class="keyword">if</span> (++cbIndex &gt;= callbacks.length || writeArgs === <span class="literal">null</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>We&#39;re done writing to all callbacks</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                cbIndex = -<span class="number">1</span>;
+                writeArgs = <span class="literal">null</span>;
+                maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
+                <span class="keyword">return</span>;
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Run the current reader</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            callbacks[cbIndex].apply(<span class="keyword">this</span>, writeArgs);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>If not blocked, recurse</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (!blocked) {
+                doWrite.apply(<span class="keyword">this</span>);
+            }
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h2>Public functions</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Read a value from the channel and execute the indicated callback, <em>cb</em>.  The callback will be invoked with the Channel bound to the &#39;this&#39; keyword.  Returns the Channel object for chaining.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.read = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
+            callbacks.push(cb);
+            maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
+            <span class="keyword">return</span> self;
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Remove a specified reader from the Channel.  Returns the Channel object for chaining.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.unread = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
+            <span class="keyword">var</span> i = -<span class="number">1</span>, len = callbacks.length;
+            <span class="keyword">while</span> (++i &lt; len) {
+                <span class="keyword">if</span> (callbacks[i] === cb) {
+                    callbacks.splice(i, <span class="number">1</span>);
+                    <span class="keyword">break</span>;
+                }
+            }
+            <span class="keyword">return</span> self;
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Block the given channel from future reads/writes until unblocked.  Returns true if the channel was previously unblocked and is now blocked.  False otherwise.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.block = <span class="function"><span class="keyword">function</span> <span class="title">block</span><span class="params">()</span> {</span>
+            <span class="keyword">if</span> (!blocked) {
+                blocked = <span class="literal">true</span>;
+                <span class="keyword">return</span> <span class="literal">true</span>;
+            }
+            <span class="keyword">return</span> <span class="literal">false</span>;
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Unblock the Channel.  Returns true if the channel was blocked and was successfully unblocked.  False otherwise.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.unblock = <span class="function"><span class="keyword">function</span> <span class="title">unblock</span><span class="params">()</span> {</span>
+            <span class="keyword">if</span> (blocked) {
+                blocked = <span class="literal">false</span>;
+                doWrite.apply(<span class="keyword">this</span>);
+                <span class="keyword">return</span> <span class="literal">true</span>;
+            }
+            <span class="keyword">return</span> <span class="literal">false</span>;
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Write values to the channel.  The &#39;arguments&#39; object from this function will be passed to each reader callback.  Returns the channel object for chaining.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.write = <span class="function"><span class="keyword">function</span> <span class="title">write</span><span class="params">()</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Queue up the write if:
+(1) there are no readers OR
+(2) we already have writes queued up OR
+(3) we&#39;re currently blocked OR
+(4) we&#39;re in the middle of processing a previous write</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (callbacks.length === <span class="number">0</span> || queuedWrites.length &gt; <span class="number">0</span> || blocked || cbIndex &gt;= <span class="number">0</span>) {
+                queuedWrites.push(arguments);
+            } <span class="keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Write!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                writeArgs = arguments;
+                doWrite.apply(<span class="keyword">this</span>);
+            }
+
+            <span class="keyword">return</span> self;
+        };
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Static utility function to read from many channels with a single callback.  Accepts the callback function followed by one or more Channel objects to read from.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    Channel.alts = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
+        <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
+            i = -<span class="number">1</span>,
+            len = args.length,
+            c;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>For each channel passed in, hook in our callback</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++i &lt; len) {
+            c = args[i];
+            c.read(cb.bind(<span class="keyword">this</span>, c));
+        }
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Static utility function to read from one and only one of a series of Channels.  After the first available read, the reader callback is unbound from all channels so that it does not fire again.  Accepts the callback function followed by one or more Channel objects to read from.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    Channel.select = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
+        <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
+            i = -<span class="number">1</span>,
+            len = args.length,
+            c,
+            wraps = [];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Get a wrapped function for this channel/callback combo.  The returned function is responsible for, on the first write from any of these channels, unbind itself and all of the other callbacks to prevent future reads, and then execute the indicated callback.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">wrap</span><span class="params">(channel, callback)</span> {</span>
+            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">wrapped</span><span class="params">(channel)</span> {</span>
+                <span class="keyword">var</span> j = -<span class="number">1</span>, len = args.length;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Unbind this reader from all channels</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="keyword">while</span> (++j &lt; len) {
+                    args[j].unread(wraps[j]);
+                }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Execute the callback in the appropriate Channel context</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="keyword">return</span> callback.apply(channel, arguments);
+            }.bind(<span class="keyword">this</span>, channel);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>For each channel passed in, cache the callback, and bind it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++i &lt; len) {
+            c = args[i];
+            wraps.push(wrap(c, cb));
+            c.read(wraps[i]);
+        }
+    };
+
+    window.Channel = Channel;
+
+}(<span class="keyword">this</span>));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

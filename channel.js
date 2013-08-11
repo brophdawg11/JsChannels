@@ -2,42 +2,44 @@
 
     function Channel(options) {
 
+        // Initialization
+        // --------------
+
         var self = this,
 
             // Writes that have been queued up if there are no readers yet
             queuedWrites = [],
 
-            // The callbacks associated through the read function
+            // Callbacks associated through the read function
             callbacks = [],
 
-            // What indexed callback are we on?  -1 -> idle
+            // Index of the currently processing callback for the most recent
+            // write.  -1 means idle
             cbIndex = -1,
 
-            // What are the arguments of our most recent write?
+            // Arguments of our most recent write
             writeArgs = null,
 
             // Am I currently blocked?
             blocked = false,
 
             // Default options
-            defaults = {},
-
-            key;
+            defaults = {};
 
 
         // Initialize options with default values
         options = typeof options === 'object' ? options : {};
-        for (key in defaults) {
+        for (var key in defaults) {
             if (typeof options[key] === 'undefined' || options[key === null]) {
                 options[key] = defaults[key];
             }
         }
 
+        // Private functions
+        // -----------------
 
-        // Try to send the next queued up write onto the channel.  If we're
-        // blocked, does nothing
+        // Try to send the next queued up write onto the channel.  If we're blocked, does nothing
         function maybeSendQueuedWrites() {
-            // If we had queuedWrites, now that we have a reader, write them
             if (!blocked && queuedWrites.length > 0) {
                 cbIndex = -1;
                 writeArgs = queuedWrites.shift();
@@ -45,8 +47,7 @@
             }
         }
 
-        // Write the current channel value onto the current reader.  Recurses
-        // on itself to process subsequent readers
+        // Write the current channel value onto the current reader.  Recurses on itself to process subsequent readers
         function doWrite() {
 
             if (++cbIndex >= callbacks.length || writeArgs === null) {
@@ -66,24 +67,18 @@
             }
         }
 
-        /**
-         * Read a value from the channel and execute the associated callback.
-         * @param  {Function} cb The callback to be invoked with the value read
-         *                       from the channel
-         * @return {Channel}     The channel object, for chaining purposes
-         */
+
+        // Public functions
+        // ----------------
+
+        // Read a value from the channel and execute the indicated callback, *cb*.  The callback will be invoked with the Channel bound to the 'this' keyword.  Returns the Channel object for chaining.
         this.read = function read(cb) {
-            // Add this callback to the queue
             callbacks.push(cb);
             maybeSendQueuedWrites.apply(this);
             return self;
         };
 
-        /**
-         * Remove a specified reader from the Channel
-         * @param  {Function} cb The reader to remove
-         * @return {Channel}    The Channel for chaining
-         */
+        // Remove a specified reader from the Channel.  Returns the Channel object for chaining.
         this.unread = function read(cb) {
             var i = -1, len = callbacks.length;
             while (++i < len) {
@@ -95,11 +90,7 @@
             return self;
         };
 
-        /**
-         * Block the given channel from future reads/writes until unblocked.
-         * @return {Booean} True if the channel was unblocked and successfully blocked
-         *                  False if the channel was already blocked.
-         */
+        // Block the given channel from future reads/writes until unblocked.  Returns true if the channel was previously unblocked and is now blocked.  False otherwise.
         this.block = function block() {
             if (!blocked) {
                 blocked = true;
@@ -108,11 +99,7 @@
             return false;
         };
 
-        /**
-         * Unblock the Channel
-         * @return {Boolean} True if the channel was blocked and was
-         * successfully unblocked.  False if it was already unblocked
-         */
+        // Unblock the Channel.  Returns true if the channel was blocked and was successfully unblocked.  False otherwise.
         this.unblock = function unblock() {
             if (blocked) {
                 blocked = false;
@@ -122,18 +109,14 @@
             return false;
         };
 
-        /**
-         * Write a value to the channel.
-         * @param  {Object} val The value to write to the channel
-         * @return {Channel}    The channel object, for chaining purposes
-         */
+        // Write values to the channel.  The 'arguments' object from this function will be passed to each reader callback.  Returns the channel object for chaining.
         this.write = function write() {
+            // Queue up the write if:
+            // (1) there are no readers OR
+            // (2) we already have writes queued up OR
+            // (3) we're currently blocked OR
+            // (4) we're in the middle of processing a previous write
             if (callbacks.length === 0 || queuedWrites.length > 0 || blocked || cbIndex >= 0) {
-                // Queue up the write if:
-                // there are no readers OR
-                // we already have writes queued up OR
-                // we're currently blocked OR
-                // we're in the middle of processing a previous write
                 queuedWrites.push(arguments);
             } else {
                 // Write!
@@ -145,16 +128,8 @@
         };
     }
 
-    /**
-     * Utility function to read from many channels with a single callback
-     * @param {Function} cb Callback function to be executed when any of the
-     *                      specified channels is written to.  Will be passed
-     *                      the Channel, followed by all written values
-     * @param {Channel}  channel The Channel to read from.  Pass as many as you
-     *                           want, comma separated
-     */
+    // Static utility function to read from many channels with a single callback.  Accepts the callback function followed by one or more Channel objects to read from.
     Channel.alts = function (cb) {
-        // Shift off the callback from the arguments array
         var args = Array.prototype.splice.call(arguments, 1),
             i = -1,
             len = args.length,
@@ -167,37 +142,25 @@
         }
     };
 
-    /**
-     * Utility function to read from one and only one of a series of Channels.
-     * After the first available read, the reader callback is unbound from all
-     * channels so that it does not fire again.
-     *
-     * @param {Function} cb Callback function to be executed when the first of the
-     *                      specified channels is written to.  Will be passed
-     *                      the Channel, followed by all written values
-     * @param {Channel}  channel The Channel to read from.  Pass as many as you
-     *                           want, comma separated
-     */
+    // Static utility function to read from one and only one of a series of Channels.  After the first available read, the reader callback is unbound from all channels so that it does not fire again.  Accepts the callback function followed by one or more Channel objects to read from.
     Channel.select = function (cb) {
-        // Shift off the callback from the arguments array
         var args = Array.prototype.splice.call(arguments, 1),
             i = -1,
             len = args.length,
             c,
             wraps = [];
 
-        // Get a wrapped function for this channel/callback combo
+        // Get a wrapped function for this channel/callback combo.  The returned function is responsible for, on the first write from any of these channels, unbind itself and all of the other callbacks to prevent future reads, and then execute the indicated callback.
         function wrap(channel, callback) {
             return function wrapped(channel) {
-                var j = -1,
-                    len = args.length;
-                console.log("J is " + j);
+                var j = -1, len = args.length;
 
                 // Unbind this reader from all channels
                 while (++j < len) {
                     args[j].unread(wraps[j]);
                 }
 
+                // Execute the callback in the appropriate Channel context
                 return callback.apply(channel, arguments);
             }.bind(this, channel);
         }
