@@ -1,3 +1,5 @@
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/04181d798dbf76e645a2ede82a6d1962 "githalytics.com")](http://githalytics.com/brophdawg11/JsChannels)
+
 JsChannels
 ==========
 
