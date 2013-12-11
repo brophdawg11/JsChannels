@@ -1,9 +1,9 @@
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/04181d798dbf76e645a2ede82a6d1962 "githalytics.com")](http://githalytics.com/brophdawg11/JsChannels)
-
 JsChannels
 ==========
 
-A minimal JavaScript Channels library (1.3k minified)
+A minimal JavaScript Channels library (1.3k minified).  Inspired by Clojure's core.async library.
+
+[Documentation](https://rawgithub.com/brophdawg11/JsChannels/master/docs/channel.html) | [Unit Tests](https://rawgithub.com/brophdawg11/JsChannels/master/tests.html) | [Examples](https://rawgithub.com/brophdawg11/JsChannels/master/examples.html)
 
 A Channel provides the following methods
 * write(value1, value2, ...) - Write the values[s] to the Channel
@@ -14,7 +14,7 @@ A Channel provides the following methods
 
 The Channel class provides two static utility methods:
 * Channel.alts(callback, Channel, Channel, ...) - Associated a callback with many channels. Callbacks passed to alts will receive the Channel object as the first argument, followed by the arguments passed to Channel.write()
-* Channel.select(callback, Channel, Channel, ...) - Associated a callback with many channels, for which the reader will execute on the first Channel to be wrtten to, an no others.  Callbacks passed to alts will receive the Channel object as the first argument, followed by the arguments passed to Channel.write()
+* Channel.select(callback, Channel, Channel, ...) - Associated a callback with many channels, for which the reader will execute on the first Channel to be wrtten to, and no others.  Callbacks passed to select will receive the Channel object as the first argument, followed by the arguments passed to Channel.write()
 
 When a channel is written to, all associated reader callbacks will be invoked,
 in order of registration, with the values written to the channel.
@@ -85,3 +85,5 @@ Reader callbacks are executed with the Channel object as the 'this' context
     c7.write(2);
     setTimeout(c7.unblock, 1000);
 
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/04181d798dbf76e645a2ede82a6d1962 "githalytics.com")](http://githalytics.com/brophdawg11/JsChannels)
