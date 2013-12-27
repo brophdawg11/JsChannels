@@ -1,4 +1,29 @@
-(function (window, undefined) {
+/* ========================================================================
+ * JsChannels v0.1
+ * A minimal JavaScript Channels library, inspired by Clojure's
+ * core.async library.
+ *
+ * Copyright (c) 2013 Matt Brophy (brophy.org)
+ * https://github.com/brophdawg11/JsChannels
+ *
+ * Author: Matt Brophy
+ * Website: http://www.brophy.org/
+ *
+ * Released under the MIT license
+ * https://github.com/brophdawg11/JsChannels/blob/master/LICENSE
+ * ------------------------------------------------------------------------ */
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(factory);
+    } else if (typeof exports === 'object') {
+        // Node.js
+        module.exports = factory();
+    } else {
+        // Browser globals
+        root.Channel = factory();
+    }
+}(this, function () {
 
     function Channel(options) {
 
@@ -173,6 +198,5 @@
         }
     };
 
-    window.Channel = Channel;
-
-}(this));
+    return Channel;
+}));
