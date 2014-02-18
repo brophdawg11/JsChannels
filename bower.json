@@ -1,0 +1,28 @@
+{
+  "name": "jschannels",
+  "version": "0.1.0",
+  "homepage": "https://github.com/brophdawg11/JsChannels",
+  "authors": [
+    "Matt Brophy <matt@brophy.org>"
+  ],
+  "description": "A minimal JavaScript Channels library, inspired by Clojure's core.async library",
+  "main": "channel.min.js",
+  "keywords": [
+    "channel",
+    "async",
+    "core.async",
+    "stream",
+    "pipe",
+    "promise",
+    "deferred"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "*.sublime*"
+  ]
+}
