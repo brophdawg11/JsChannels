@@ -31,8 +31,8 @@
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="comment">/* ========================================================================
- * JsChannels v0.1
- * A A minimal JavaScript Channels library, inspired by Clojure's
+ * JsChannels v0.1.0
+ * A minimal JavaScript Channels library, inspired by Clojure's
  * core.async library.
  *
  * Copyright (c) 2013 Matt Brophy (brophy.org)
@@ -44,9 +44,8 @@
  * Released under the MIT license
  * https://github.com/brophdawg11/JsChannels/blob/master/LICENSE
  * ------------------------------------------------------------------------ */</span>
-
 (<span class="function"><span class="keyword">function</span> <span class="params">(root, factory)</span> {</span>
-    <span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
+  <span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
             
         </li>
         
@@ -61,8 +60,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        define(factory);
-    } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> exports === <span class="string">'object'</span>) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    define(factory);
+  } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> exports === <span class="string">'object'</span>) {</pre></div></div>
             
         </li>
         
@@ -77,8 +76,8 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        module.exports = factory();
-    } <span class="keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    module.exports = factory();
+  } <span class="keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -93,11 +92,12 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        root.Channel = factory();
-    }
+            <div class="content"><div class='highlight'><pre>    root.Channel = factory();
+  }
 }(<span class="keyword">this</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+  <span class="string">"use strict"</span>;
 
-    <span class="function"><span class="keyword">function</span> <span class="title">Channel</span><span class="params">(options)</span> {</span></pre></div></div>
+  <span class="function"><span class="keyword">function</span> <span class="title">Channel</span><span class="params">(options)</span> {</span></pre></div></div>
             
         </li>
         
@@ -124,7 +124,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> self = <span class="keyword">this</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> self = <span class="keyword">this</span>,</pre></div></div>
             
         </li>
         
@@ -139,7 +139,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            queuedWrites = [],</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        queuedWrites = [],</pre></div></div>
             
         </li>
         
@@ -154,7 +154,7 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            callbacks = [],</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        callbacks = [],</pre></div></div>
             
         </li>
         
@@ -170,7 +170,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            cbIndex = -<span class="number">1</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="number">1</span>,</pre></div></div>
             
         </li>
         
@@ -185,7 +185,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            writeArgs = <span class="literal">null</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        writeArgs = <span class="literal">null</span>,</pre></div></div>
             
         </li>
         
@@ -200,7 +200,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            blocked = <span class="literal">false</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        blocked = <span class="literal">false</span>,</pre></div></div>
             
         </li>
         
@@ -215,7 +215,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            defaults = {};</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        defaults = {},
+
+        key;</pre></div></div>
             
         </li>
         
@@ -230,12 +232,12 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        options = <span class="keyword">typeof</span> options === <span class="string">'object'</span> ? options : {};
-        <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> defaults) {
-            <span class="keyword">if</span> (<span class="keyword">typeof</span> options[key] === <span class="string">'undefined'</span> || options[key === <span class="literal">null</span>]) {
-                options[key] = defaults[key];
-            }
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    options = <span class="keyword">typeof</span> options === <span class="string">'object'</span> ? options : {};
+    <span class="keyword">for</span> (key <span class="keyword">in</span> defaults) {
+      <span class="keyword">if</span> (<span class="keyword">typeof</span> options[key] === <span class="string">'undefined'</span> || options[key === <span class="literal">null</span>]) {
+        options[key] = defaults[key];
+      }
+    }</pre></div></div>
             
         </li>
         
@@ -263,13 +265,14 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">maybeSendQueuedWrites</span><span class="params">()</span> {</span>
-            <span class="keyword">if</span> (!blocked &amp;&amp; queuedWrites.length &gt; <span class="number">0</span>) {
-                cbIndex = -<span class="number">1</span>;
-                writeArgs = queuedWrites.shift();
-                doWrite.apply(<span class="keyword">this</span>);
-            }
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">maybeSendQueuedWrites</span><span class="params">()</span> {</span>
+      <span class="keyword">if</span> (!blocked &amp;&amp; queuedWrites.length &gt; <span class="number">0</span>) {
+        cbIndex = -<span class="number">1</span>;
+        writeArgs = queuedWrites.shift();
+        <span class="comment">/* jshint validthis:true */</span>
+        doWrite.apply(<span class="keyword">this</span>);
+      }
+    }</pre></div></div>
             
         </li>
         
@@ -284,9 +287,10 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">doWrite</span><span class="params">()</span> {</span>
+            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">doWrite</span><span class="params">()</span> {</span>
+      <span class="comment">/* jshint validthis:true */</span>
 
-            <span class="keyword">if</span> (++cbIndex &gt;= callbacks.length || writeArgs === <span class="literal">null</span>) {</pre></div></div>
+      <span class="keyword">if</span> (++cbIndex &gt;= callbacks.length || writeArgs === <span class="literal">null</span>) {</pre></div></div>
             
         </li>
         
@@ -301,11 +305,11 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                cbIndex = -<span class="number">1</span>;
-                writeArgs = <span class="literal">null</span>;
-                maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
-                <span class="keyword">return</span>;
-            }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="number">1</span>;
+        writeArgs = <span class="literal">null</span>;
+        maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
+        <span class="keyword">return</span>;
+      }</pre></div></div>
             
         </li>
         
@@ -320,7 +324,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            callbacks[cbIndex].apply(<span class="keyword">this</span>, writeArgs);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      callbacks[cbIndex].apply(<span class="keyword">this</span>, writeArgs);</pre></div></div>
             
         </li>
         
@@ -335,10 +339,10 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (!blocked) {
-                doWrite.apply(<span class="keyword">this</span>);
-            }
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (!blocked) {
+        doWrite.apply(<span class="keyword">this</span>);
+      }
+    }</pre></div></div>
             
         </li>
         
@@ -366,11 +370,11 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.read = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
-            callbacks.push(cb);
-            maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
-            <span class="keyword">return</span> self;
-        };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.read = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
+      callbacks.push(cb);
+      maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
+      <span class="keyword">return</span> self;
+    };</pre></div></div>
             
         </li>
         
@@ -385,16 +389,16 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.unread = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
-            <span class="keyword">var</span> i = -<span class="number">1</span>, len = callbacks.length;
-            <span class="keyword">while</span> (++i &lt; len) {
-                <span class="keyword">if</span> (callbacks[i] === cb) {
-                    callbacks.splice(i, <span class="number">1</span>);
-                    <span class="keyword">break</span>;
-                }
-            }
-            <span class="keyword">return</span> self;
-        };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.unread = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
+      <span class="keyword">var</span> i = -<span class="number">1</span>, len = callbacks.length;
+      <span class="keyword">while</span> (++i &lt; len) {
+        <span class="keyword">if</span> (callbacks[i] === cb) {
+          callbacks.splice(i, <span class="number">1</span>);
+          <span class="keyword">break</span>;
+        }
+      }
+      <span class="keyword">return</span> self;
+    };</pre></div></div>
             
         </li>
         
@@ -409,13 +413,13 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.block = <span class="function"><span class="keyword">function</span> <span class="title">block</span><span class="params">()</span> {</span>
-            <span class="keyword">if</span> (!blocked) {
-                blocked = <span class="literal">true</span>;
-                <span class="keyword">return</span> <span class="literal">true</span>;
-            }
-            <span class="keyword">return</span> <span class="literal">false</span>;
-        };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.block = <span class="function"><span class="keyword">function</span> <span class="title">block</span><span class="params">()</span> {</span>
+      <span class="keyword">if</span> (!blocked) {
+        blocked = <span class="literal">true</span>;
+        <span class="keyword">return</span> <span class="literal">true</span>;
+      }
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    };</pre></div></div>
             
         </li>
         
@@ -430,14 +434,14 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.unblock = <span class="function"><span class="keyword">function</span> <span class="title">unblock</span><span class="params">()</span> {</span>
-            <span class="keyword">if</span> (blocked) {
-                blocked = <span class="literal">false</span>;
-                doWrite.apply(<span class="keyword">this</span>);
-                <span class="keyword">return</span> <span class="literal">true</span>;
-            }
-            <span class="keyword">return</span> <span class="literal">false</span>;
-        };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.unblock = <span class="function"><span class="keyword">function</span> <span class="title">unblock</span><span class="params">()</span> {</span>
+      <span class="keyword">if</span> (blocked) {
+        blocked = <span class="literal">false</span>;
+        doWrite.apply(<span class="keyword">this</span>);
+        <span class="keyword">return</span> <span class="literal">true</span>;
+      }
+      <span class="keyword">return</span> <span class="literal">false</span>;
+    };</pre></div></div>
             
         </li>
         
@@ -452,7 +456,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">this</span>.write = <span class="function"><span class="keyword">function</span> <span class="title">write</span><span class="params">()</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.write = <span class="function"><span class="keyword">function</span> <span class="title">write</span><span class="params">()</span> {</span></pre></div></div>
             
         </li>
         
@@ -471,9 +475,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (callbacks.length === <span class="number">0</span> || queuedWrites.length &gt; <span class="number">0</span> || blocked || cbIndex &gt;= <span class="number">0</span>) {
-                queuedWrites.push(arguments);
-            } <span class="keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (callbacks.length === <span class="number">0</span> || queuedWrites.length &gt; <span class="number">0</span> || blocked || cbIndex &gt;= <span class="number">0</span>) {
+        queuedWrites.push(arguments);
+      } <span class="keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -488,13 +492,13 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                writeArgs = arguments;
-                doWrite.apply(<span class="keyword">this</span>);
-            }
+            <div class="content"><div class='highlight'><pre>        writeArgs = arguments;
+        doWrite.apply(<span class="keyword">this</span>);
+      }
 
-            <span class="keyword">return</span> self;
-        };
-    }</pre></div></div>
+      <span class="keyword">return</span> self;
+    };
+  }</pre></div></div>
             
         </li>
         
@@ -509,11 +513,11 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    Channel.alts = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
-        <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
-            i = -<span class="number">1</span>,
-            len = args.length,
-            c;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  Channel.alts = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
+    <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
+        i = -<span class="number">1</span>,
+        len = args.length,
+        c;</pre></div></div>
             
         </li>
         
@@ -528,11 +532,11 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++i &lt; len) {
-            c = args[i];
-            c.read(cb.bind(<span class="keyword">this</span>, c));
-        }
-    };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">while</span> (++i &lt; len) {
+      c = args[i];
+      c.read(cb.bind(<span class="keyword">this</span>, c));
+    }
+  };</pre></div></div>
             
         </li>
         
@@ -547,12 +551,13 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    Channel.select = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
-        <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
-            i = -<span class="number">1</span>,
-            len = args.length,
-            c,
-            wraps = [];</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  Channel.select = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
+    <span class="comment">/* jshint validthis:true */</span>
+    <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
+        i = -<span class="number">1</span>,
+        len = args.length,
+        c,
+        wraps = [];</pre></div></div>
             
         </li>
         
@@ -567,9 +572,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="function"><span class="keyword">function</span> <span class="title">wrap</span><span class="params">(channel, callback)</span> {</span>
-            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">wrapped</span><span class="params">(channel)</span> {</span>
-                <span class="keyword">var</span> j = -<span class="number">1</span>, len = args.length;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">wrap</span><span class="params">(channel, callback)</span> {</span>
+      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">wrapped</span><span class="params">(channel)</span> {</span>
+        <span class="keyword">var</span> j = -<span class="number">1</span>, len = args.length;</pre></div></div>
             
         </li>
         
@@ -584,9 +589,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="keyword">while</span> (++j &lt; len) {
-                    args[j].unread(wraps[j]);
-                }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++j &lt; len) {
+          args[j].unread(wraps[j]);
+        }</pre></div></div>
             
         </li>
         
@@ -601,9 +606,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="keyword">return</span> callback.apply(channel, arguments);
-            }.bind(<span class="keyword">this</span>, channel);
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> callback.apply(channel, arguments);
+      }.bind(<span class="literal">null</span>, channel);
+    }</pre></div></div>
             
         </li>
         
@@ -618,15 +623,14 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++i &lt; len) {
-            c = args[i];
-            wraps.push(wrap(c, cb));
-            c.read(wraps[i]);
-        }
-    };
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">while</span> (++i &lt; len) {
+      c = args[i];
+      wraps.push(wrap(c, cb));
+      c.read(wraps[i]);
+    }
+  };
 
-    <span class="keyword">return</span> Channel;
-
+  <span class="keyword">return</span> Channel;
 }));</pre></div></div>
             
         </li>

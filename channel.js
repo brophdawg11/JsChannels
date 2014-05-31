@@ -24,6 +24,7 @@
     root.Channel = factory();
   }
 }(this, function () {
+  "use strict";
 
   function Channel(options) {
 
@@ -49,12 +50,14 @@
         blocked = false,
 
         // Default options
-        defaults = {};
+        defaults = {},
+
+        key;
 
 
     // Initialize options with default values
     options = typeof options === 'object' ? options : {};
-    for (var key in defaults) {
+    for (key in defaults) {
       if (typeof options[key] === 'undefined' || options[key === null]) {
         options[key] = defaults[key];
       }
@@ -68,12 +71,14 @@
       if (!blocked && queuedWrites.length > 0) {
         cbIndex = -1;
         writeArgs = queuedWrites.shift();
+        /* jshint validthis:true */
         doWrite.apply(this);
       }
     }
 
     // Write the current channel value onto the current reader.  Recurses on itself to process subsequent readers
     function doWrite() {
+      /* jshint validthis:true */
 
       if (++cbIndex >= callbacks.length || writeArgs === null) {
         // We're done writing to all callbacks
@@ -169,6 +174,7 @@
 
   // Static utility function to read from one and only one of a series of Channels.  After the first available read, the reader callback is unbound from all channels so that it does not fire again.  Accepts the callback function followed by one or more Channel objects to read from.
   Channel.select = function (cb) {
+    /* jshint validthis:true */
     var args = Array.prototype.splice.call(arguments, 1),
         i = -1,
         len = args.length,
@@ -187,7 +193,7 @@
 
         // Execute the callback in the appropriate Channel context
         return callback.apply(channel, arguments);
-      }.bind(this, channel);
+      }.bind(null, channel);
     }
 
     // For each channel passed in, cache the callback, and bind it
