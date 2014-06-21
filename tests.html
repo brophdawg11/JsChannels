@@ -11,6 +11,33 @@
   <script src="resources/qunit-1.12.0.js"></script>
   <script src="channel.js"></script>
   <script>
+
+    // via https://github.com/brophdawg11/Automator.js/blob/b161e253d9917d1ca41c2a5dc6d27f94e5022e99/tests.html#L16
+    // PhantomJS does not support bind
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function (oThis) {
+          if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5
+            // internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying " +
+                                "to be bound is not callable");
+          }
+
+          var aArgs = Array.prototype.slice.call(arguments, 1),
+              fToBind = this,
+              fNOP = function () {},
+              fBound = function () {
+                var args = aArgs.concat(Array.prototype.slice.call(arguments));
+                return fToBind.apply(this, args);
+              };
+
+          fNOP.prototype = this.prototype;
+          fBound.prototype = new fNOP();
+
+          return fBound;
+        };
+    }
+
     asyncTest("Single read/write test", function () {
         var c = new Channel(),
             value = 1;

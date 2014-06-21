@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "gulp build",
+    "doc": "gulp docs",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -27,5 +29,13 @@
   "bugs": {
     "url": "https://github.com/brophdawg11/JsChannels/issues"
   },
-  "homepage": "https://github.com/brophdawg11/JsChannels"
+  "homepage": "https://github.com/brophdawg11/JsChannels",
+  "devDependencies": {
+    "gulp-rename": "~1.2.0",
+    "gulp-uglify": "~0.3.0",
+    "gulp-docco": "0.0.4",
+    "gulp-bump": "~0.1.8",
+    "gulp-qunit": "~0.3.3",
+    "gulp": "~3.8.1"
+  }
 }
