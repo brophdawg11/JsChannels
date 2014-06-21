@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="comment">/* ========================================================================
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/* ========================================================================
  * JsChannels v0.1.0
  * A minimal JavaScript Channels library, inspired by Clojure's
  * core.async library.
@@ -44,8 +44,8 @@
  * Released under the MIT license
  * https://github.com/brophdawg11/JsChannels/blob/master/LICENSE
  * ------------------------------------------------------------------------ */</span>
-(<span class="function"><span class="keyword">function</span> <span class="params">(root, factory)</span> {</span>
-  <span class="keyword">if</span> (<span class="keyword">typeof</span> define === <span class="string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
+(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(root, factory)</span> {</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
             
         </li>
         
@@ -61,7 +61,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    define(factory);
-  } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span> exports === <span class="string">'object'</span>) {</pre></div></div>
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> exports === <span class="hljs-string">'object'</span>) {</pre></div></div>
             
         </li>
         
@@ -77,7 +77,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>    module.exports = factory();
-  } <span class="keyword">else</span> {</pre></div></div>
+  } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -94,10 +94,10 @@
             
             <div class="content"><div class='highlight'><pre>    root.Channel = factory();
   }
-}(<span class="keyword">this</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
-  <span class="string">"use strict"</span>;
+}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+<span class="hljs-pi">  "use strict"</span>;
 
-  <span class="function"><span class="keyword">function</span> <span class="title">Channel</span><span class="params">(options)</span> {</span></pre></div></div>
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Channel</span><span class="hljs-params">(options)</span> {</span></pre></div></div>
             
         </li>
         
@@ -105,10 +105,10 @@
         <li id="section-5">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2>Initialization</h2>
+              <h2 id="initialization">Initialization</h2>
 
             </div>
             
@@ -124,7 +124,8 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> self = <span class="keyword">this</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>,</pre></div></div>
             
         </li>
         
@@ -170,7 +171,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="number">1</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="hljs-number">1</span>,</pre></div></div>
             
         </li>
         
@@ -185,7 +186,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        writeArgs = <span class="literal">null</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        writeArgs = <span class="hljs-literal">null</span>,</pre></div></div>
             
         </li>
         
@@ -200,7 +201,7 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        blocked = <span class="literal">false</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        blocked = <span class="hljs-literal">false</span>,</pre></div></div>
             
         </li>
         
@@ -232,9 +233,9 @@ write.  -1 means idle</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    options = <span class="keyword">typeof</span> options === <span class="string">'object'</span> ? options : {};
-    <span class="keyword">for</span> (key <span class="keyword">in</span> defaults) {
-      <span class="keyword">if</span> (<span class="keyword">typeof</span> options[key] === <span class="string">'undefined'</span> || options[key === <span class="literal">null</span>]) {
+            <div class="content"><div class='highlight'><pre>    options = <span class="hljs-keyword">typeof</span> options === <span class="hljs-string">'object'</span> ? options : {};
+    <span class="hljs-keyword">for</span> (key <span class="hljs-keyword">in</span> defaults) {
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> options[key] === <span class="hljs-string">'undefined'</span> || options[key === <span class="hljs-literal">null</span>]) {
         options[key] = defaults[key];
       }
     }</pre></div></div>
@@ -245,10 +246,10 @@ write.  -1 means idle</p>
         <li id="section-14">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <h2>Private functions</h2>
+              <h2 id="private-functions">Private functions</h2>
 
             </div>
             
@@ -261,18 +262,8 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Try to send the next queued up write onto the channel.  If we&#39;re blocked, does nothing</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">maybeSendQueuedWrites</span><span class="params">()</span> {</span>
-      <span class="keyword">if</span> (!blocked &amp;&amp; queuedWrites.length &gt; <span class="number">0</span>) {
-        cbIndex = -<span class="number">1</span>;
-        writeArgs = queuedWrites.shift();
-        <span class="comment">/* jshint validthis:true */</span>
-        doWrite.apply(<span class="keyword">this</span>);
-      }
-    }</pre></div></div>
             
         </li>
         
@@ -283,14 +274,18 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>Write the current channel value onto the current reader.  Recurses on itself to process subsequent readers</p>
+              <p>Try to send the next queued up write onto the channel.  If we’re blocked, does nothing</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">doWrite</span><span class="params">()</span> {</span>
-      <span class="comment">/* jshint validthis:true */</span>
-
-      <span class="keyword">if</span> (++cbIndex &gt;= callbacks.length || writeArgs === <span class="literal">null</span>) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">maybeSendQueuedWrites</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">if</span> (!blocked &amp;&amp; queuedWrites.length &gt; <span class="hljs-number">0</span>) {
+        cbIndex = -<span class="hljs-number">1</span>;
+        writeArgs = queuedWrites.shift();
+        <span class="hljs-comment">/* jshint validthis:true */</span>
+        doWrite.apply(<span class="hljs-keyword">this</span>);
+      }
+    }</pre></div></div>
             
         </li>
         
@@ -301,15 +296,14 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>We&#39;re done writing to all callbacks</p>
+              <p>Write the current channel value onto the current reader.  Recurses on itself to process subsequent readers</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="number">1</span>;
-        writeArgs = <span class="literal">null</span>;
-        maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
-        <span class="keyword">return</span>;
-      }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doWrite</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-comment">/* jshint validthis:true */</span>
+
+      <span class="hljs-keyword">if</span> (++cbIndex &gt;= callbacks.length || writeArgs === <span class="hljs-literal">null</span>) {</pre></div></div>
             
         </li>
         
@@ -320,11 +314,15 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Run the current reader</p>
+              <p>We’re done writing to all callbacks</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      callbacks[cbIndex].apply(<span class="keyword">this</span>, writeArgs);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        cbIndex = -<span class="hljs-number">1</span>;
+        writeArgs = <span class="hljs-literal">null</span>;
+        maybeSendQueuedWrites.apply(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">return</span>;
+      }</pre></div></div>
             
         </li>
         
@@ -335,14 +333,11 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>If not blocked, recurse</p>
+              <p>Run the current reader</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (!blocked) {
-        doWrite.apply(<span class="keyword">this</span>);
-      }
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      callbacks[cbIndex].apply(<span class="hljs-keyword">this</span>, writeArgs);</pre></div></div>
             
         </li>
         
@@ -350,12 +345,17 @@ write.  -1 means idle</p>
         <li id="section-20">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <h2>Public functions</h2>
+              <p>If not blocked, recurse</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!blocked) {
+        doWrite.apply(<span class="hljs-keyword">this</span>);
+      }
+    }</pre></div></div>
             
         </li>
         
@@ -366,15 +366,9 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>Read a value from the channel and execute the indicated callback, <em>cb</em>.  The callback will be invoked with the Channel bound to the &#39;this&#39; keyword.  Returns the Channel object for chaining.</p>
+              <h2 id="public-functions">Public functions</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.read = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
-      callbacks.push(cb);
-      maybeSendQueuedWrites.apply(<span class="keyword">this</span>);
-      <span class="keyword">return</span> self;
-    };</pre></div></div>
             
         </li>
         
@@ -385,20 +379,8 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>Remove a specified reader from the Channel.  Returns the Channel object for chaining.</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.unread = <span class="function"><span class="keyword">function</span> <span class="title">read</span><span class="params">(cb)</span> {</span>
-      <span class="keyword">var</span> i = -<span class="number">1</span>, len = callbacks.length;
-      <span class="keyword">while</span> (++i &lt; len) {
-        <span class="keyword">if</span> (callbacks[i] === cb) {
-          callbacks.splice(i, <span class="number">1</span>);
-          <span class="keyword">break</span>;
-        }
-      }
-      <span class="keyword">return</span> self;
-    };</pre></div></div>
             
         </li>
         
@@ -409,16 +391,14 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Block the given channel from future reads/writes until unblocked.  Returns true if the channel was previously unblocked and is now blocked.  False otherwise.</p>
+              <p>Read a value from the channel and execute the indicated callback, <em>cb</em>.  The callback will be invoked with the Channel bound to the ‘this’ keyword.  Returns the Channel object for chaining.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.block = <span class="function"><span class="keyword">function</span> <span class="title">block</span><span class="params">()</span> {</span>
-      <span class="keyword">if</span> (!blocked) {
-        blocked = <span class="literal">true</span>;
-        <span class="keyword">return</span> <span class="literal">true</span>;
-      }
-      <span class="keyword">return</span> <span class="literal">false</span>;
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.read = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">read</span><span class="hljs-params">(cb)</span> {</span>
+      callbacks.push(cb);
+      maybeSendQueuedWrites.apply(<span class="hljs-keyword">this</span>);
+      <span class="hljs-keyword">return</span> self;
     };</pre></div></div>
             
         </li>
@@ -430,17 +410,19 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Unblock the Channel.  Returns true if the channel was blocked and was successfully unblocked.  False otherwise.</p>
+              <p>Remove a specified reader from the Channel.  Returns the Channel object for chaining.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.unblock = <span class="function"><span class="keyword">function</span> <span class="title">unblock</span><span class="params">()</span> {</span>
-      <span class="keyword">if</span> (blocked) {
-        blocked = <span class="literal">false</span>;
-        doWrite.apply(<span class="keyword">this</span>);
-        <span class="keyword">return</span> <span class="literal">true</span>;
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.unread = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">read</span><span class="hljs-params">(cb)</span> {</span>
+      <span class="hljs-keyword">var</span> i = -<span class="hljs-number">1</span>, len = callbacks.length;
+      <span class="hljs-keyword">while</span> (++i &lt; len) {
+        <span class="hljs-keyword">if</span> (callbacks[i] === cb) {
+          callbacks.splice(i, <span class="hljs-number">1</span>);
+          <span class="hljs-keyword">break</span>;
+        }
       }
-      <span class="keyword">return</span> <span class="literal">false</span>;
+      <span class="hljs-keyword">return</span> self;
     };</pre></div></div>
             
         </li>
@@ -452,11 +434,17 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Write values to the channel.  The &#39;arguments&#39; object from this function will be passed to each reader callback.  Returns the channel object for chaining.</p>
+              <p>Block the given channel from future reads/writes until unblocked.  Returns true if the channel was previously unblocked and is now blocked.  False otherwise.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.write = <span class="function"><span class="keyword">function</span> <span class="title">write</span><span class="params">()</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.block = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">block</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">if</span> (!blocked) {
+        blocked = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    };</pre></div></div>
             
         </li>
         
@@ -467,17 +455,18 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>Queue up the write if:
-(1) there are no readers OR
-(2) we already have writes queued up OR
-(3) we&#39;re currently blocked OR
-(4) we&#39;re in the middle of processing a previous write</p>
+              <p>Unblock the Channel.  Returns true if the channel was blocked and was successfully unblocked.  False otherwise.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (callbacks.length === <span class="number">0</span> || queuedWrites.length &gt; <span class="number">0</span> || blocked || cbIndex &gt;= <span class="number">0</span>) {
-        queuedWrites.push(arguments);
-      } <span class="keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.unblock = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">unblock</span><span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">if</span> (blocked) {
+        blocked = <span class="hljs-literal">false</span>;
+        doWrite.apply(<span class="hljs-keyword">this</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    };</pre></div></div>
             
         </li>
         
@@ -488,17 +477,11 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <p>Write!</p>
+              <p>Write values to the channel.  The ‘arguments’ object from this function will be passed to each reader callback.  Returns the channel object for chaining.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        writeArgs = arguments;
-        doWrite.apply(<span class="keyword">this</span>);
-      }
-
-      <span class="keyword">return</span> self;
-    };
-  }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">this</span>.write = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">write</span><span class="hljs-params">()</span> {</span></pre></div></div>
             
         </li>
         
@@ -509,15 +492,17 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <p>Static utility function to read from many channels with a single callback.  Accepts the callback function followed by one or more Channel objects to read from.</p>
+              <p>Queue up the write if:
+(1) there are no readers OR
+(2) we already have writes queued up OR
+(3) we’re currently blocked OR
+(4) we’re in the middle of processing a previous write</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  Channel.alts = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
-    <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
-        i = -<span class="number">1</span>,
-        len = args.length,
-        c;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (callbacks.length === <span class="hljs-number">0</span> || queuedWrites.length &gt; <span class="hljs-number">0</span> || blocked || cbIndex &gt;= <span class="hljs-number">0</span>) {
+        queuedWrites.push(<span class="hljs-built_in">arguments</span>);
+      } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -528,15 +513,17 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
-              <p>For each channel passed in, hook in our callback</p>
+              <p>Write!</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">while</span> (++i &lt; len) {
-      c = args[i];
-      c.read(cb.bind(<span class="keyword">this</span>, c));
-    }
-  };</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        writeArgs = <span class="hljs-built_in">arguments</span>;
+        doWrite.apply(<span class="hljs-keyword">this</span>);
+      }
+
+      <span class="hljs-keyword">return</span> self;
+    };
+  }</pre></div></div>
             
         </li>
         
@@ -547,17 +534,15 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
-              <p>Static utility function to read from one and only one of a series of Channels.  After the first available read, the reader callback is unbound from all channels so that it does not fire again.  Accepts the callback function followed by one or more Channel objects to read from.</p>
+              <p>Static utility function to read from many channels with a single callback.  Accepts the callback function followed by one or more Channel objects to read from.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  Channel.select = <span class="function"><span class="keyword">function</span> <span class="params">(cb)</span> {</span>
-    <span class="comment">/* jshint validthis:true */</span>
-    <span class="keyword">var</span> args = Array.prototype.splice.call(arguments, <span class="number">1</span>),
-        i = -<span class="number">1</span>,
+            <div class="content"><div class='highlight'><pre>  Channel.alts = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cb)</span> {</span>
+    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">Array</span>.prototype.splice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">1</span>),
+        i = -<span class="hljs-number">1</span>,
         len = args.length,
-        c,
-        wraps = [];</pre></div></div>
+        c;</pre></div></div>
             
         </li>
         
@@ -568,13 +553,15 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
-              <p>Get a wrapped function for this channel/callback combo.  The returned function is responsible for, on the first write from any of these channels, unbind itself and all of the other callbacks to prevent future reads, and then execute the indicated callback.</p>
+              <p>For each channel passed in, hook in our callback</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="function"><span class="keyword">function</span> <span class="title">wrap</span><span class="params">(channel, callback)</span> {</span>
-      <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">wrapped</span><span class="params">(channel)</span> {</span>
-        <span class="keyword">var</span> j = -<span class="number">1</span>, len = args.length;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">while</span> (++i &lt; len) {
+      c = args[i];
+      c.read(cb.bind(<span class="hljs-keyword">this</span>, c));
+    }
+  };</pre></div></div>
             
         </li>
         
@@ -585,13 +572,17 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <p>Unbind this reader from all channels</p>
+              <p>Static utility function to read from one and only one of a series of Channels.  After the first available read, the reader callback is unbound from all channels so that it does not fire again.  Accepts the callback function followed by one or more Channel objects to read from.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">while</span> (++j &lt; len) {
-          args[j].unread(wraps[j]);
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  Channel.select = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cb)</span> {</span>
+    <span class="hljs-comment">/* jshint validthis:true */</span>
+    <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">Array</span>.prototype.splice.call(<span class="hljs-built_in">arguments</span>, <span class="hljs-number">1</span>),
+        i = -<span class="hljs-number">1</span>,
+        len = args.length,
+        c,
+        wraps = [];</pre></div></div>
             
         </li>
         
@@ -602,13 +593,13 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
-              <p>Execute the callback in the appropriate Channel context</p>
+              <p>Get a wrapped function for this channel/callback combo.  The returned function is responsible for, on the first write from any of these channels, unbind itself and all of the other callbacks to prevent future reads, and then execute the indicated callback.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> callback.apply(channel, arguments);
-      }.bind(<span class="literal">null</span>, channel);
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrap</span><span class="hljs-params">(channel, callback)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">wrapped</span><span class="hljs-params">(channel)</span> {</span>
+        <span class="hljs-keyword">var</span> j = -<span class="hljs-number">1</span>, len = args.length;</pre></div></div>
             
         </li>
         
@@ -619,18 +610,52 @@ write.  -1 means idle</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
+              <p>Unbind this reader from all channels</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">while</span> (++j &lt; len) {
+          args[j].unread(wraps[j]);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Execute the callback in the appropriate Channel context</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> callback.apply(channel, <span class="hljs-built_in">arguments</span>);
+      }.bind(<span class="hljs-literal">null</span>, channel);
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
               <p>For each channel passed in, cache the callback, and bind it</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">while</span> (++i &lt; len) {
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">while</span> (++i &lt; len) {
       c = args[i];
       wraps.push(wrap(c, cb));
       c.read(wraps[i]);
     }
   };
 
-  <span class="keyword">return</span> Channel;
+  <span class="hljs-keyword">return</span> Channel;
 }));</pre></div></div>
             
         </li>
