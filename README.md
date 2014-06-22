@@ -1,6 +1,8 @@
 JsChannels
 ==========
 
+![Build Status](https://travis-ci.org/brophdawg11/JsChannels.svg?branch=master)
+
 A minimal JavaScript Channels library (1.3k minified).  Inspired by Clojure's core.async library.
 
 [Documentation](https://rawgithub.com/brophdawg11/JsChannels/master/docs/channel.html) | [Unit Tests](https://rawgithub.com/brophdawg11/JsChannels/master/tests.html) | [Examples](https://rawgithub.com/brophdawg11/JsChannels/master/examples.html)
