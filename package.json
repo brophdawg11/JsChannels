@@ -1,6 +1,6 @@
 {
   "name": "jschannels",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A minimal JavaScript Channels library, inspired by Clojure's core.async library",
   "main": "channel.min.js",
   "directories": {
