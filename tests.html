@@ -437,7 +437,6 @@
         c0.write();
     });
 
-
     asyncTest("Test queuing writes from a reader", function() {
         var c = new Channel(),
             count = 0,
@@ -466,6 +465,42 @@
         c.read(reader);
         // initiate first write
         c.write(count);
+    });
+
+    test("Test throwing exceptions from a reader", function() {
+      var flag = false,
+          channel = new Channel(),
+          num = 5,
+          count = 0;
+
+      function read(a) {
+        count++;
+        if (flag) {
+            throw new Error('test');
+        }
+      }
+
+      function write(a) {
+        try {
+          channel.write(a);
+        } catch (e) {
+
+        }
+      }
+
+      channel.read(read);
+
+      for (var i = 0; i < num; i++) {
+          write(flag);
+      }
+
+      flag = true;
+
+      for (var i = 0; i < num; i++) {
+          write(flag);
+      }
+
+      strictEqual(count, num * 2, "Ensure we received the right number of reads");
     });
 
   </script>
