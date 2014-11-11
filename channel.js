@@ -88,12 +88,14 @@
         return;
       }
 
-      // Run the current reader
-      callbacks[cbIndex].apply(this, writeArgs);
-
-      // If not blocked, recurse
-      if (!blocked) {
-        doWrite.apply(this);
+      try {
+        // Run the current reader
+        callbacks[cbIndex].apply(this, writeArgs);
+      } finally {
+        // If not blocked, recurse
+        if (!blocked) {
+          doWrite.apply(this);
+        }
       }
     }
 
