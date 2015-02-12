@@ -24,5 +24,8 @@
     "test",
     "tests",
     "*.sublime*"
-  ]
+  ],
+  "dependencies": {
+    "traceur-runtime": "~0.0.78"
+  }
 }
